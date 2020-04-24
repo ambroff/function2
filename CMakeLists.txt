@@ -36,6 +36,8 @@ target_compile_features(function2
     cxx_trailing_return_types
     cxx_return_type_deduction)
 
+option(FU2_ENABLE_TESTS "Build and run unit tests" ON)
+
 if (FU2_IS_TOP_LEVEL_PROJECT)
   include(ExternalProject)
   include(GNUInstallDirs)
@@ -100,29 +102,31 @@ if (FU2_IS_TOP_LEVEL_PROJECT)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive-")
   endif()
 
-  enable_testing()
+  if (FU2_ENABLE_TESTS)
+    enable_testing()
 
-  option(FU2_WITH_NO_EXCEPTIONS
+    option(FU2_WITH_NO_EXCEPTIONS
       "Test without exceptions"
       OFF)
-  option(FU2_WITH_NO_DEATH_TESTS
+    option(FU2_WITH_NO_DEATH_TESTS
       "Test without death tests"
       OFF)
-  option(FU2_WITH_CPP_LATEST
+    option(FU2_WITH_CPP_LATEST
       "Enable the highest C++ standard available for testing polyfills"
       OFF)
 
-  if (FU2_WITH_NO_EXCEPTIONS)
-    message(STATUS "Testing with exceptions disabled")
-    add_definitions(-DTESTS_NO_EXCEPTIONS)
+    if (FU2_WITH_NO_EXCEPTIONS)
+      message(STATUS "Testing with exceptions disabled")
+      add_definitions(-DTESTS_NO_EXCEPTIONS)
+    endif()
+
+    if (FU2_WITH_NO_DEATH_TESTS)
+      message(STATUS "Testing without death tests")
+      add_definitions(-DTESTS_NO_DEATH_TESTS)
+    endif()
+
+    include(cmake/CMakeLists.txt)
+
+    add_subdirectory(test)
   endif()
-
-  if (FU2_WITH_NO_DEATH_TESTS)
-    message(STATUS "Testing without death tests")
-    add_definitions(-DTESTS_NO_DEATH_TESTS)
-  endif()
-
-  include(cmake/CMakeLists.txt)
-
-  add_subdirectory(test)
 endif ()
